@@ -25,6 +25,9 @@ export const addImagePromptInfo = (imageElement: HTMLElement, targetImageUrl: st
         wrapperElement.style.top = "0";
         wrapperElement.style.right = "0";
         (imageElement.parentElement as HTMLElement).style.position = "relative";
+        if ((imageElement.parentElement as HTMLElement).parentElement?.querySelector(".prompt_info") !== null) {
+            return;
+        }
         (imageElement.parentElement as HTMLElement).appendChild(wrapperElement);
         const root = createRoot(wrapperElement);
         if (response?.exif?.pngText?.parameters?.description) {
