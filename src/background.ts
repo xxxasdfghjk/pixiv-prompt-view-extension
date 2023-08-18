@@ -1,5 +1,7 @@
 import browser from "webextension-polyfill";
 import ExifReader from "exifreader";
+import { getBucket } from "@extend-chrome/storage";
+import { defaultOption, type Option } from "./storagedOptions";
 
 // show welcome page on new install
 browser.runtime.onInstalled.addListener(async (details) => {
@@ -8,6 +10,8 @@ browser.runtime.onInstalled.addListener(async (details) => {
         const url = browser.runtime.getURL("welcome/welcome.html");
         await browser.tabs.create({ url });
     }
+
+    getBucket<Option>("options").set(defaultOption);
 
     const rules = [
         {
