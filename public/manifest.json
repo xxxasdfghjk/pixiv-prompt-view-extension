@@ -1,13 +1,9 @@
 {
     "manifest_version": 3,
 
-    "name": "Chrome Extension TypeScript Starter",
-    "description": "Chrome Extension, TypeScript, Visual Studio Code",
+    "name": "Pixiv AI Generated Prompt Display",
+    "description": "Enable you see generated picture prompt easyly on Pixiv.",
     "version": "1.0",
-
-    "options_ui": {
-        "page": "options.html"
-    },
 
     "action": {
         "default_icon": "icon.png",
@@ -17,7 +13,7 @@
     "content_scripts": [
         {
             "matches": ["<all_urls>"],
-            "js": ["js/vendor.js", "js/content_script.js", "js/handleOnLoad.js"]
+            "js": ["js/content_script.js", "js/handleOnLoad.js"]
         }
     ],
 
