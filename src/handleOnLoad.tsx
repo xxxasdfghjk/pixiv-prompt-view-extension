@@ -1,14 +1,12 @@
+import { getBucket } from "@extend-chrome/storage";
 import { addImagePromptInfo, addImagePromptInfoFirstImage, artWorkAnkerSelector } from "./addPromptInfo";
-(() => {
+import type { Option } from "./storagedOptions";
+(async () => {
+    if ((await getBucket<Option>("options").get()).enableThisExtension === false) {
+        return;
+    }
     const callback: MutationCallback = (mutationsList, observer) => {
         for (const { addedNodes, removedNodes } of mutationsList) {
-            if (removedNodes.length > 0) {
-                for (const removedNode of removedNodes) {
-                    const node = (removedNode as HTMLElement).querySelector(".prompt_info");
-                    if (node) {
-                    }
-                }
-            }
             if (addedNodes.length == 0) continue;
             for (const node of addedNodes) {
                 if (
@@ -51,5 +49,5 @@ import { addImagePromptInfo, addImagePromptInfoFirstImage, artWorkAnkerSelector 
             }, 200);
         });
         setTimeout(addImagePromptInfoFirstImage, 0);
-    }, 200);
+    }, 300);
 })();

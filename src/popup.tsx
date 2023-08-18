@@ -1,58 +1,59 @@
 import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { getBucket } from "@extend-chrome/storage";
+import styled from "styled-components";
+import { FormControlLabel, Switch } from "@mui/material";
+import { defaultOption } from "./storagedOptions";
+import type { Option } from "./storagedOptions";
+
+export const bucket = getBucket<Option>("options");
 
 const Popup = () => {
-  const [count, setCount] = useState(0);
-  const [currentURL, setCurrentURL] = useState<string>();
+    const [option, setOption] = useState<Option>(defaultOption);
+    useEffect(() => {
+        bucket.get().then(console.log);
+        bucket.get().then(setOption);
+    }, []);
 
-  useEffect(() => {
-    chrome.action.setBadgeText({ text: count.toString() });
-  }, [count]);
+    const setOptionStorage = (a: Option) => {
+        bucket.set(a).then(() => setOption(a));
+    };
 
-  useEffect(() => {
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      setCurrentURL(tabs[0].url);
-    });
-  }, []);
-
-  const changeBackground = () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      const tab = tabs[0];
-      if (tab.id) {
-        chrome.tabs.sendMessage(
-          tab.id,
-          {
-            color: "#555555",
-          },
-          (msg) => {
-            console.log("result message:", msg);
-          }
-        );
-      }
-    });
-  };
-
-  return (
-    <>
-      <ul style={{ minWidth: "700px" }}>
-        <li>Current URL: {currentURL}</li>
-        <li>Current Time: {new Date().toLocaleTimeString()}</li>
-      </ul>
-      <button
-        onClick={() => setCount(count + 1)}
-        style={{ marginRight: "5px" }}
-      >
-        count up
-      </button>
-      <button onClick={changeBackground}>change background</button>
-    </>
-  );
+    return (
+        <SSwitchWrapper>
+            <FormControlLabel
+                control={
+                    <Switch
+                        checked={option.enableThisExtension}
+                        onChange={({ target }) => setOptionStorage({ ...option, enableThisExtension: target.checked })}
+                    />
+                }
+                label="Enable This Extension"
+            />
+            <FormControlLabel
+                control={
+                    <Switch
+                        checked={option.displayNoInfoImage}
+                        onChange={({ target }) => setOptionStorage({ ...option, displayNoInfoImage: target.checked })}
+                        disabled={option.enableThisExtension === false}
+                    />
+                }
+                label="Display No Info Image"
+            />
+        </SSwitchWrapper>
+    );
 };
+
+export const SSwitchWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+`;
 
 const root = createRoot(document.getElementById("root")!);
 
 root.render(
-  <React.StrictMode>
-    <Popup />
-  </React.StrictMode>
+    <React.StrictMode>
+        <Popup />
+    </React.StrictMode>
 );

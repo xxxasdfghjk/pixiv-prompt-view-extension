@@ -8,6 +8,8 @@ import { styled as muiStyled } from "@material-ui/core/styles";
 import ContentPasteIcon from "@mui/icons-material/ContentPaste";
 import { styled } from "styled-components";
 import CheckIcon from "@mui/icons-material/Check";
+import type { Option } from "./../storagedOptions";
+import { getBucket } from "@extend-chrome/storage";
 
 type PromptInfo = {
     prompt: string;
@@ -111,6 +113,7 @@ const PromptContainer = (props: PromptContainerProps) => {
     const [state, setState] = useState<"poji" | "nega" | "set" | "noinfo">(
         props.promptInfo === undefined ? "noinfo" : "set"
     );
+    const [hideNoInfo, setHideNoInfo] = useState<boolean>(false);
     const [isCopied, setIsCopied] = useState<boolean>(false);
     const currentText =
         props.promptInfo !== undefined
@@ -120,10 +123,26 @@ const PromptContainer = (props: PromptContainerProps) => {
                 ? props.promptInfo.negativePrompt
                 : props.promptInfo.generateSetting
             : "NO INFO";
+    const hideThisElement = hideNoInfo && state === "noinfo";
+    useEffect(() => {
+        const listener = () => {
+            getBucket<Option>("options")
+                .get()
+                .then((options) => {
+                    setHideNoInfo(!options.displayNoInfoImage || !options.enableThisExtension);
+                });
+        };
+        chrome.storage.onChanged.addListener(listener);
+        listener();
+        return () => {
+            chrome.storage.onChanged.removeListener(listener);
+        };
+    }, []);
+
     useEffect(() => {
         setIsCopied(false);
     }, [state]);
-    return (
+    return !hideThisElement ? (
         <StyledEngineProvider injectFirst>
             <SWrapper>
                 <ChangeButtons
@@ -148,6 +167,8 @@ const PromptContainer = (props: PromptContainerProps) => {
                 )}
             </SWrapper>
         </StyledEngineProvider>
+    ) : (
+        <div></div>
     );
 };
 
@@ -169,6 +190,7 @@ const SWrapper = styled.div`
     z-index: 100;
     background: black;
     padding: 20px;
+    border-radius: 20px;
 `;
 const SColumn = styled.div`
     height: 100%;
