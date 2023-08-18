@@ -169,6 +169,7 @@ const SWrapper = styled.div`
     z-index: 100;
     background: black;
     padding: 20px;
+    border-radius: 20px;
 `;
 const SColumn = styled.div`
     height: 100%;
